@@ -57,7 +57,9 @@ export const getMany = {
     querystring: {
         type: 'object',
         properties: {
-            _id: { type: 'string' },
+            filter: {
+                type: 'string',
+            },
         },
     },
     response: {

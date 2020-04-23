@@ -84,8 +84,12 @@ const getTodosHandler: HandlerWithInstance = async (
 ) => {
     const query = req.query as any;
 
+    const preparedPayload = query.filter
+        ? JSON.parse(query.filter)
+        : {};
+
     try {
-        const todos = await fastify.todoService.getMany(query);
+        const todos = await fastify.todoService.getMany(preparedPayload);
         reply.send(todos);
     } catch (err) {
         reply.send(err);
