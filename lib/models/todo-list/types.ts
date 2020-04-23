@@ -50,7 +50,7 @@ export namespace TodoListModel {
 
     export interface Controller {
         add: Add;
-        // delete: Delete;
+        delete: Delete;
         get: Get;
         getMany: GetMany;
     }

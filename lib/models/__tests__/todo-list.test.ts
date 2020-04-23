@@ -10,10 +10,12 @@ import { TodoModelController, TodoSchema } from '../todo';
 type NonNullFromDB = NonNullable<TodoListModel.FromDBPopulated>;
 
 describe('Todo list model controller', () => {
+    /** Main model in this tests (TodoList) */
     const model: Model<Document & TodoListSchema> = mongoose.model('TodoList', todoListSchema);
     const todoModel: Model<Document & TodoSchema> = mongoose.model('Todo', todoSchema);
+    /** Main controller in this tests (TodoList) */
     const modelController = new TodoListModelController();
-    const todoController = new TodoModelController();
+    const todoModelController = new TodoModelController();
 
     beforeAll(async () => {
         mongoose.set('useFindAndModify', true);
@@ -25,7 +27,7 @@ describe('Todo list model controller', () => {
 
     afterEach(async () => {
         await model.deleteMany({});
-        await todoController.removeMany({});
+        await todoModel.deleteMany({});
     });
 
     afterAll(async () => {
@@ -109,5 +111,31 @@ describe('Todo list model controller', () => {
         }) as NonNullFromDB[];
 
         expect(todoLists).toHaveLength(0);
+    });
+
+    test(`delete should return amount of deleted todo lists`, async () => {
+        const todoList = await modelController.add({
+            name: 'list',
+        }) as NonNullFromDB;
+
+        const rmData = await modelController.delete(todoList._id);
+
+        expect(rmData.deletedCount).toBe(1);
+    });
+
+    test(`delete should also delete all todos related to this todo list`, async () => {
+        const todoList = await modelController.add({
+            name: 'list',
+            todos: ['hello'],
+        }) as NonNullFromDB;
+
+        const rmData = await modelController.delete(todoList._id);
+
+        const deletedTodos = await todoModelController.getMany({
+            title: 'hello',
+        });
+
+        expect(rmData.deletedCount).toBe(1);
+        expect(deletedTodos).toHaveLength(0);
     });
 });
