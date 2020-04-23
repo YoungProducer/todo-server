@@ -11,6 +11,11 @@ export const todoSchema = new Schema<TodoSchema>({
         type: 'string',
         required: true,
     },
+    todoList: {
+        type: Schema.Types.ObjectId,
+        required: true,
+        ref: 'TodoList',
+    },
 }, {
     autoIndex: true,
     timestamps: true,

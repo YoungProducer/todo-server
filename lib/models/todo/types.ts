@@ -1,10 +1,11 @@
 /** External imports */
-import { Model, Document, Query, FilterQuery } from 'mongoose';
+import { Model, Document, Query, FilterQuery, Types } from 'mongoose';
 import { todoSchema } from './schema';
 
 export interface TodoSchema {
     _id: string;
     title: string;
+    todoList: Types.ObjectId;
     createdAt: Date;
     updatedAt: Date;
 }
