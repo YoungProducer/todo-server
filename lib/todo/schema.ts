@@ -79,21 +79,36 @@ export const remove = {
         },
     },
     response: {
-        200: 'todo#',
+        200: {
+            type: 'object',
+            additionalProperties: false,
+            properties: {
+                ok: { type: 'number' },
+                n: { type: 'number' },
+                deletedCount: { type: 'number' },
+            },
+        },
     },
 };
 
 export const removeMany = {
     querystring: {
         type: 'object',
-        properties: todoProperties,
+        properties: {
+            filter: {
+                type: 'string',
+            },
+        },
     },
     response: {
         200: {
             type: 'object',
-            ok: 'number',
-            n: 'number',
-            deletedCount: 'number',
+            additionalProperties: false,
+            properties: {
+                ok: { type: 'number' },
+                n: { type: 'number' },
+                deletedCount: { type: 'number' },
+            },
         },
     },
 };

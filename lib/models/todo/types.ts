@@ -36,14 +36,20 @@ export namespace TodoModel {
 
     export type FromDB = Document & TodoSchema | null;
 
+    export interface DeleteReturn {
+        ok?: number;
+        n?: number;
+        deletedCount?: number;
+    }
+
     export type Add = (payload: AddPayload) => Promise<FromDB | FromDB[]>;
-    export type Remove = (payload: RemovePayload) => Promise<FromDB>;
-    export type RemoveMany = (payload: ManyPayload) => Promise<{
+    export type Remove = (payload: RemovePayload) => Promise<{
         ok?: number | undefined;
         n?: number | undefined;
     } & {
         deletedCount?: number | undefined;
     }>;
+    export type RemoveMany = (payload: ManyPayload) => Promise<DeleteReturn>;
     export type Update = (payload: UpdatePayload) => Promise<FromDB>;
     export type Get = (payload: GetPayload) => Promise<FromDB>;
     export type GetMany = (payload: ManyPayload) => Promise<FromDB[]>;

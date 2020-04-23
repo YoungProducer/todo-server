@@ -56,7 +56,7 @@ const createTodoHandler: HandlerWithInstance = async (
                 ? payload
                 : ({ title: payload.title }),
         );
-        reply.send(([] as TodoModel.FromDB[]).concat(todo));
+        reply.status(201).send(([] as TodoModel.FromDB[]).concat(todo));
     } catch (err) {
         reply.send(err);
     }
@@ -104,8 +104,8 @@ const deleteTodoHandler: HandlerWithInstance = async (
     const payload = req.params as TodoModel.RemovePayload;
 
     try {
-        const todo = await fastify.todoService.remove(payload);
-        reply.send(todo);
+        const rmData = await fastify.todoService.remove(payload);
+        reply.send(rmData);
     } catch (err) {
         reply.send(err);
     }
@@ -116,10 +116,14 @@ const deleteTodosHandler: HandlerWithInstance = async (
     reply,
     fastify,
 ) => {
-    const payload = req.query as TodoModel.ManyPayload;
+    const query = req.query as any;
+
+    const preparedPayload = query.filter
+        ? JSON.parse(query.filter)
+        : {};
 
     try {
-        const removedData = await fastify.todoService.removeMany(payload);
+        const removedData = await fastify.todoService.removeMany(preparedPayload);
         reply.send(removedData);
     } catch (err) {
         reply.send(err);

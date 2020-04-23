@@ -6,7 +6,7 @@ import { TodoModel } from '../models/todo';
 
 export namespace Todo {
     export type Create = (payload: TodoModel.AddPayload) => ReturnType<TodoModel.Add>;
-    export type Remove = (payload: TodoModel.RemovePayload) => Promise<TodoModel.FromDB>;
+    export type Remove = (payload: TodoModel.RemovePayload) => ReturnType<TodoModel.Remove>;
     export type RemoveMany = (payload: TodoModel.ManyPayload) => ReturnType<TodoModel.RemoveMany>;
     export type Get = (payload: TodoModel.RemovePayload) => Promise<TodoModel.FromDB>;
     export type GetMany = (payload: TodoModel.ManyPayload) => Promise<TodoModel.FromDB[]>;

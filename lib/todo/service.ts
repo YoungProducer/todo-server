@@ -17,15 +17,15 @@ export class TodoService implements Todo.Service {
     }
 
     remove: Todo.Remove = async (payload) => {
-        const removedTodo = await this.modelController.remove(payload);
+        const rmData = await this.modelController.remove(payload);
 
-        if (removedTodo === null) {
+        if (!rmData.deletedCount || rmData.deletedCount === 0) {
             throw new HttpErrors.NotFound(
                 `There is not todo with this id: ${payload._id}.`,
             );
         }
 
-        return removedTodo;
+        return rmData;
     }
 
     removeMany: Todo.RemoveMany = async (payload) => {
@@ -37,7 +37,7 @@ export class TodoService implements Todo.Service {
             );
         }
 
-        return await this.modelController.removeMany(payload);
+        return rmData;
     }
 
     get: Todo.Get = async (payload) => {

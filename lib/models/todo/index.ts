@@ -20,7 +20,9 @@ export class TodoModelController implements TodoModel.Controller {
     }
 
     remove: TodoModel.Remove = async (payload) => {
-        const removedTodo = await this.model.findByIdAndRemove(payload._id);
+        const removedTodo = await this.model.deleteOne({
+            _id: payload._id,
+        });
         return removedTodo;
     }
 
