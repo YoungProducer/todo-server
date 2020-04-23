@@ -44,14 +44,16 @@ export namespace TodoListModel {
     export type DeletePayload = string;
 
     export type Add = (payload: AddPayload) => Promise<FromDB | FromDB[]>;
-    export type Delete = (payload: DeletePayload) => Promise<DeleteReturn>;
     export type Get = (payload: GetPayload) => Promise<FromDBPopulated>;
     export type GetMany = (payload: ManyPayload) => Promise<FromDBPopulated[]>;
+    export type Delete = (payload: DeletePayload) => Promise<DeleteReturn>;
+    export type DeleteMany = (payload: ManyPayload) => Promise<DeleteReturn>;
 
     export interface Controller {
         add: Add;
-        delete: Delete;
         get: Get;
         getMany: GetMany;
+        delete: Delete;
+        deleteMany: DeleteMany;
     }
 }

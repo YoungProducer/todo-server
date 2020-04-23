@@ -89,4 +89,16 @@ export class TodoListModelController implements TodoListModel.Controller {
 
         return await this.model.deleteOne({ _id });
     }
+
+    deleteMany: TodoListModel.DeleteMany = async (payload) => {
+        const todoListsToDelete = await this.model.find(payload);
+
+        await this.todoModel.deleteMany({
+            todoList: {
+                $in: todoListsToDelete.map(list => list._id),
+            },
+        });
+
+        return await this.model.deleteMany(payload);
+    }
 }

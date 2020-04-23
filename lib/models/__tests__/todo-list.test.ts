@@ -138,4 +138,64 @@ describe('Todo list model controller', () => {
         expect(rmData.deletedCount).toBe(1);
         expect(deletedTodos).toHaveLength(0);
     });
+
+    test(`deleteMany should delete all todo lists if filter is empty`, async () => {
+        await modelController.add({
+            name: 'todos123',
+            todos: ['first'],
+        }) as TodoListSchema;
+        await modelController.add({
+            name: 'todos456',
+            todos: ['second'],
+        }) as TodoListSchema;
+
+        const rmData = await modelController.deleteMany({});
+
+        expect(rmData.deletedCount).toBe(2);
+    });
+
+    test(`deleteMany should delete todo lists related to this filter`, async () => {
+        await modelController.add({
+            name: 'todos123',
+            todos: ['first'],
+        }) as TodoListSchema;
+        await modelController.add({
+            name: 'todos456',
+            todos: ['second'],
+        }) as TodoListSchema;
+
+        const rmData = await modelController.deleteMany({
+            name: {
+                $in: ['todos123', 'todos456'],
+            },
+        });
+
+        expect(rmData.deletedCount).toBe(2);
+    });
+
+    test(`deleteMany should delete all todos which related to deleted todo lists`, async () => {
+        await modelController.add({
+            name: 'todos123',
+            todos: ['first'],
+        }) as TodoListSchema;
+        await modelController.add({
+            name: 'todos456',
+            todos: ['second'],
+        }) as TodoListSchema;
+
+        const rmData = await modelController.deleteMany({
+            name: {
+                $in: ['todos123', 'todos456'],
+            },
+        });
+
+        const deletedTodos = await todoModelController.getMany({
+            title: {
+                $in: ['first', 'second'],
+            },
+        });
+
+        expect(rmData.deletedCount).toBe(2);
+        expect(deletedTodos).toHaveLength(0);
+    });
 });
