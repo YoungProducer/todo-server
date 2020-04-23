@@ -5,12 +5,16 @@ import { todoSchema } from './schema';
 export interface TodoSchema {
     _id: string;
     title: string;
-    todoList: Types.ObjectId;
+    todoList: string;
     createdAt: Date;
     updatedAt: Date;
 }
 
 export namespace TodoModel {
+    export type Populated = {
+        [P in keyof TodoSchema]: TodoSchema[P];
+    };
+
     export type AddPayload =
         | Omit<TodoSchema, '_id' | 'createdAt' | 'updatedAt'>
         | Omit<TodoSchema, '_id' | 'createdAt' | 'updatedAt'>[];

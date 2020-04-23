@@ -1,12 +1,13 @@
 /** External imports */
-import { Types, Document } from 'mongoose';
+import { Types, Document, FilterQuery } from 'mongoose';
 
 /** Application's imports */
 import { TodoSchema } from '../todo';
+import { TodoModel } from '../todo/types';
 
 export interface TodoListSchema {
     _id: string;
-    todos: string[] | TodoListModel.PopulatedTodo[];
+    todos: string[] | TodoModel.Populated[];
     name: string;
     createdAt: Date;
     updatedAt: Date;
@@ -18,15 +19,11 @@ export namespace TodoListModel {
         & TodoListSchema
         | null;
 
-    export type PopulatedTodo = {
-        [P in keyof TodoSchema]: TodoSchema[P];
-    };
-
     export type FromDBPopulated =
         & Document
         & Omit<TodoListSchema, 'todos'>
         & {
-            todos: PopulatedTodo[],
+            todos: TodoModel.Populated[],
         }
         | null;
 
@@ -35,6 +32,8 @@ export namespace TodoListModel {
         n?: number;
         deletedCount?: number;
     }
+
+    export type ManyPayload = FilterQuery<TodoListSchema>;
 
     export type AddPayload =
         | Pick<TodoListSchema, 'name'> & { todos?: string }
@@ -47,10 +46,12 @@ export namespace TodoListModel {
     export type Add = (payload: AddPayload) => Promise<FromDB | FromDB[]>;
     export type Delete = (payload: DeletePayload) => Promise<DeleteReturn>;
     export type Get = (payload: GetPayload) => Promise<FromDBPopulated>;
+    export type GetMany = (payload: ManyPayload) => Promise<FromDBPopulated[]>;
 
     export interface Controller {
         add: Add;
         // delete: Delete;
         get: Get;
+        getMany: GetMany;
     }
 }

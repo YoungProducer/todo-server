@@ -75,6 +75,10 @@ export class TodoListModelController implements TodoListModel.Controller {
             .populate('todos') as TodoListModel.FromDBPopulated;
     }
 
+    getMany: TodoListModel.GetMany = async (payload) => {
+        return await this.model.find(payload).populate('todos') as TodoListModel.FromDBPopulated[];
+    }
+
     // delete: TodoListModel.Delete = async (_id) => {
     //     return await this.model.deleteOne({ _id });
     // }

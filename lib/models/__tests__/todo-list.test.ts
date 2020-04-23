@@ -66,4 +66,48 @@ describe('Todo list model controller', () => {
 
         expect(todoList).toBeNull();
     });
+
+    test(`getMany should return all todo lists if filter not provided`, async () => {
+        await modelController.add({
+            name: 'todos123',
+            todos: ['first'],
+        }) as TodoListSchema;
+        await modelController.add({
+            name: 'todos456',
+            todos: ['second'],
+        }) as TodoListSchema;
+
+        const todoLists = await modelController.getMany({}) as NonNullFromDB[];
+
+        expect(todoLists).toHaveLength(2);
+        /** Assert that todos are populated */
+        expect(todoLists[0].todos[0]).toHaveProperty('_id');
+    });
+
+    test(`getMany should return array of todo lists if filter is valid`, async () => {
+        await modelController.add({
+            name: 'todos123',
+            todos: ['first'],
+        }) as TodoListSchema;
+        await modelController.add({
+            name: 'todos456',
+            todos: ['second'],
+        }) as TodoListSchema;
+
+        const todoLists = await modelController.getMany({
+            name: 'todos123',
+        }) as NonNullFromDB[];
+
+        expect(todoLists).toHaveLength(1);
+        /** Assert that todos are populated */
+        expect(todoLists[0].todos[0]).toHaveProperty('_id');
+    });
+
+    test(`getMany should return empty array if filter is invalid`, async () => {
+        const todoLists = await modelController.getMany({
+            name: 'todos123',
+        }) as NonNullFromDB[];
+
+        expect(todoLists).toHaveLength(0);
+    });
 });
