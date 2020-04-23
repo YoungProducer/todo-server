@@ -1,5 +1,5 @@
 /** External imports */
-import { Types, Document, FilterQuery } from 'mongoose';
+import { Types, Document, FilterQuery, UpdateQuery } from 'mongoose';
 
 /** Application's imports */
 import { TodoSchema } from '../todo';
@@ -49,6 +49,11 @@ export namespace TodoListModel {
     export type GetMany = (payload: ManyPayload) => Promise<FromDBPopulated[]>;
     export type Delete = (payload: DeletePayload) => Promise<DeleteReturn>;
     export type DeleteMany = (payload: ManyPayload) => Promise<DeleteReturn>;
+    export type Update = (
+        filter: {
+            _id: string,
+        },
+        data: UpdateQuery<Omit<TodoListSchema, 'todos'>>) => Promise<FromDBPopulated>;
 
     export interface Controller {
         add: Add;
@@ -56,5 +61,6 @@ export namespace TodoListModel {
         getMany: GetMany;
         delete: Delete;
         deleteMany: DeleteMany;
+        update: Update;
     }
 }

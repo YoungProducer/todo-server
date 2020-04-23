@@ -103,4 +103,16 @@ export class TodoListModelController implements TodoListModel.Controller {
 
         return await this.model.deleteMany(payload);
     }
+
+    update: TodoListModel.Update = async (filter, data) => {
+        const updatedTodoList = await this.model.updateOne(filter, data);
+
+        if (updatedTodoList === null) {
+            return null;
+        }
+
+        return await this.model
+            .findOne(filter)
+            .populate('todos') as TodoListModel.FromDBPopulated;
+    }
 }

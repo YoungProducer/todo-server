@@ -198,4 +198,28 @@ describe('Todo list model controller', () => {
         expect(rmData.deletedCount).toBe(2);
         expect(deletedTodos).toHaveLength(0);
     });
+
+    test(`update should return updated todo list if filter is valid`, async () => {
+        const todo = await modelController.add({
+            name: 'foo',
+        }) as NonNullFromDB;
+
+        const updatedTodo = await modelController.update({
+            _id: todo._id,
+        }, {
+            name: 'bar',
+        }) as NonNullFromDB;
+
+        expect(updatedTodo.name).toBe('bar');
+    });
+
+    test(`update should return null if filter is invalid`, async () => {
+        const updatedTodo = await modelController.update({
+            _id: '5ea1e5aa57c7e974a9828205',
+        }, {
+            name: 'bar',
+        }) as NonNullFromDB;
+
+        expect(updatedTodo).toBeNull();
+    });
 });
