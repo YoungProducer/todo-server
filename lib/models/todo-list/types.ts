@@ -38,12 +38,13 @@ export namespace TodoListModel {
     export type AddPayload =
         | Pick<TodoListSchema, 'name'> & { todos?: string }
         | Pick<TodoListSchema, 'name'> & { todos?: string[] };
-
     export type GetPayload = string;
-
     export type DeletePayload = string;
+    export type UpdatePayload = any;
 
-    export type Add = (payload: AddPayload) => Promise<FromDB | FromDB[]>;
+    export type Add = (payload: AddPayload) => Promise<
+        | FromDB
+        | FromDBPopulated>;
     export type Get = (payload: GetPayload) => Promise<FromDBPopulated>;
     export type GetMany = (payload: ManyPayload) => Promise<FromDBPopulated[]>;
     export type Delete = (payload: DeletePayload) => Promise<DeleteReturn>;

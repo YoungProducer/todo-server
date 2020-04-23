@@ -66,7 +66,9 @@ export class TodoListModelController implements TodoListModel.Controller {
 
                 todoList = await this.model.findOne({
                     _id: todoList._id,
-                }) as Document & TodoListSchema;
+                }).populate('todos') as NonNullable<TodoListModel.FromDBPopulated>;
+
+                return todoList;
             }
         }
 
