@@ -4,11 +4,15 @@ import mongoose from 'mongoose';
 /** Application's imports */
 import { instance as fastify } from '../../index';
 import { Model, Document } from 'mongoose';
-import { TodoSchema, TodoModel } from '../../models/todo';
+import { TodoSchema, TodoModel, TodoModelController } from '../../models/todo';
 import { todoSchema } from '../../models/todo/schema';
+import { TodoListModelController, TodoListSchema } from '../../models/todo-list';
+import { Todo } from '../types';
 
 describe('Todo controller', () => {
     const model: Model<Document & TodoSchema> = mongoose.model('Todo', todoSchema);
+    const todoModelController = new TodoModelController();
+    const todoListModelController = new TodoListModelController();
 
     beforeAll(async () => {
         await mongoose.connect('mongodb+srv://WithoutHands:Sasha080701@mycluster-qntjt.azure.mongodb.net/todo-dashboard-test?retryWrites=true&w=majority', {
@@ -18,7 +22,8 @@ describe('Todo controller', () => {
     });
 
     afterEach(async () => {
-        await model.deleteMany({});
+        await todoModelController.removeMany({});
+        await todoListModelController.deleteMany({});
     });
 
     afterAll(async () => {
@@ -26,11 +31,16 @@ describe('Todo controller', () => {
     });
 
     test('POST /todo should return array with one created todo if payload is single object', async () => {
+        const todoList = await todoListModelController.add({
+            name: 'first',
+        }) as NonNullable<Document & TodoListSchema>;
+
         const res = await fastify.inject({
             method: 'POST',
             url: '/todo',
             payload: {
                 title: 'hello',
+                todoList: todoList._id,
             },
         });
 
@@ -39,11 +49,16 @@ describe('Todo controller', () => {
     });
 
     test('POST /todo should return array with created todos if payload is array of objects', async () => {
+        const todoList = await todoListModelController.add({
+            name: 'first',
+        }) as NonNullable<Document & TodoListSchema>;
+
         const res = await fastify.inject({
             method: 'POST',
             url: '/todo',
             payload: [{
                 title: 'hello123123',
+                todoList: todoList._id,
             }],
         });
 
@@ -52,9 +67,14 @@ describe('Todo controller', () => {
     });
 
     test('GET /todo should return todo if todo id is passed to params', async () => {
-        const todo = await model.create({
+        const todoList = await todoListModelController.add({
+            name: 'first',
+        }) as NonNullable<Document & TodoListSchema>;
+
+        const todo = await todoModelController.add({
             title: 'hello',
-        });
+            todoList: todoList._id,
+        }) as NonNullable<Document & TodoSchema>;
 
         const res = await fastify.inject({
             method: 'GET',
@@ -76,11 +96,10 @@ describe('Todo controller', () => {
     });
 
     test('GET /todo should return all todos if filter does not passed', async () => {
-        await model.create([{
-            title: 'hello',
-        }, {
-            title: 'world',
-        }]);
+        const todoList = await todoListModelController.add({
+            name: 'first',
+            todos: ['hello', 'world'],
+        }) as NonNullable<Document & TodoListSchema>;
 
         const res = await fastify.inject({
             method: 'GET',
@@ -92,11 +111,10 @@ describe('Todo controller', () => {
     });
 
     test('GET /todo should return only todos which fit to passed filter', async () => {
-        await model.create([{
-            title: 'hello',
-        }, {
-            title: 'world',
-        }]);
+        const todoList = await todoListModelController.add({
+            name: 'first',
+            todos: ['hello', 'world'],
+        }) as NonNullable<Document & TodoListSchema>;
 
         const res = await fastify.inject({
             method: 'GET',
@@ -128,10 +146,14 @@ describe('Todo controller', () => {
     });
 
     test('DELETE /todo should return remove data if request contains valid id in params', async () => {
-        /** Create todo which controller should delete */
-        const todo = await model.create({
-            title: 'title',
-        });
+        const todoList = await todoListModelController.add({
+            name: 'first',
+        }) as NonNullable<Document & TodoListSchema>;
+
+        const todo = await todoModelController.add({
+            title: 'hello',
+            todoList: todoList._id,
+        }) as NonNullable<Document & TodoSchema>;
 
         const res = await fastify.inject({
             method: 'DELETE',
@@ -151,11 +173,10 @@ describe('Todo controller', () => {
     });
 
     test('DELETE /todo should return remove data if todos exist which fit to filter', async () => {
-        await model.create({
-            title: 'foo',
-        }, {
-            title: 'bar',
-        });
+        const todoList = await todoListModelController.add({
+            name: 'first',
+            todos: ['foo', 'bar'],
+        }) as NonNullable<Document & TodoListSchema>;
 
         const res = await fastify.inject({
             method: 'DELETE',

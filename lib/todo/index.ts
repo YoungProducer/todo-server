@@ -51,11 +51,12 @@ const createTodoHandler: HandlerWithInstance = async (
     const payload: TodoModel.AddPayload = req.body;
 
     try {
-        const todo = await fastify.todoService.create(
-            Array.isArray(payload)
-                ? payload
-                : ({ title: payload.title }),
-        );
+        // const todo = await fastify.todoService.create(
+        //     Array.isArray(payload)
+        //         ? payload
+        //         : ({ title: payload.title, todoList: payload.todoList }),
+        // );
+        const todo = await fastify.todoService.create(payload);
         reply.status(201).send(([] as TodoModel.FromDB[]).concat(todo));
     } catch (err) {
         reply.send(err);

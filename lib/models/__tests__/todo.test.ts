@@ -3,6 +3,7 @@ import mongoose, { Model, Document } from 'mongoose';
 
 /** Application's imports */
 import { TodoModelController, TodoSchema, TodoModel } from '../todo';
+import { TodoListModelController, TodoListSchema } from '../todo-list';
 import { todoSchema } from '../todo/schema';
 
 type NonNullFromDB = Document & TodoSchema;
@@ -10,6 +11,7 @@ type NonNullFromDB = Document & TodoSchema;
 describe('TodoModelController', () => {
     const model: Model<Document & TodoSchema> = mongoose.model('Todo', todoSchema);
     const modelController = new TodoModelController();
+    const todoListModelController = new TodoListModelController();
 
     beforeAll(async () => {
         await mongoose.connect('mongodb+srv://WithoutHands:Sasha080701@mycluster-qntjt.azure.mongodb.net/todo-dashboard-test?retryWrites=true&w=majority', {
@@ -18,14 +20,23 @@ describe('TodoModelController', () => {
         });
     });
 
-    afterAll(async () => {
+    afterEach(async () => {
         await model.deleteMany({});
+        await todoListModelController.deleteMany({});
+    });
+
+    afterAll(async () => {
         mongoose.disconnect();
     });
 
     test('Create todo', async () => {
+        const todoList = await todoListModelController.add({
+            name: 'test',
+        }) as NonNullable<Document & TodoListSchema>;
+
         await modelController.add({
             title: 'foo',
+            todoList: todoList._id,
         });
 
         const foundTodo = await model.findOne({
@@ -36,10 +47,16 @@ describe('TodoModelController', () => {
     });
 
     test('Create many todos', async () => {
+        const todoList = await todoListModelController.add({
+            name: 'test',
+        }) as NonNullable<Document & TodoListSchema>;
+
         await modelController.add([{
             title: 'foo123',
+            todoList: todoList._id,
         }, {
             title: 'bar123',
+            todoList: todoList._id,
         }]);
 
         const foundTodos = await model.find({
@@ -52,8 +69,13 @@ describe('TodoModelController', () => {
     });
 
     test('Read todo', async () => {
+        const todoList = await todoListModelController.add({
+            name: 'test',
+        }) as NonNullable<Document & TodoListSchema>;
+
         const newTodo = await modelController.add({
             title: 'bar',
+            todoList: todoList._id,
         }) as NonNullFromDB;
 
         const readTodo = await modelController.get(newTodo._id);
@@ -62,6 +84,13 @@ describe('TodoModelController', () => {
     });
 
     test('Read many', async () => {
+        const todoList = await todoListModelController.add({
+            name: 'test',
+        }) as NonNullable<Document & TodoListSchema>;
+
+        await modelController.add({ title: 'foo', todoList: todoList._id });
+        await modelController.add({ title: 'bar', todoList: todoList._id });
+
         const todos = await modelController.getMany({
             title: {
                 $in: ['foo', 'bar'],
@@ -72,8 +101,12 @@ describe('TodoModelController', () => {
     });
 
     test('Remove many', async () => {
-        await modelController.add({ title: 'hello' });
-        await modelController.add({ title: 'world' });
+        const todoList = await todoListModelController.add({
+            name: 'test',
+        }) as NonNullable<Document & TodoListSchema>;
+
+        await modelController.add({ title: 'hello', todoList: todoList._id });
+        await modelController.add({ title: 'world', todoList: todoList._id });
 
         const rmData = await modelController.removeMany({
             title: {
@@ -85,7 +118,11 @@ describe('TodoModelController', () => {
     });
 
     test('Update todo', async () => {
-        const todo = await modelController.add({ title: 'baz' }) as NonNullFromDB;
+        const todoList = await todoListModelController.add({
+            name: 'test',
+        }) as NonNullable<Document & TodoListSchema>;
+
+        const todo = await modelController.add({ title: 'baz', todoList: todoList._id }) as NonNullFromDB;
 
         await modelController.update({
             where: {

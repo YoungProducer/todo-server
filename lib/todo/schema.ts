@@ -16,9 +16,10 @@ export const add = {
         oneOf: [
             {
                 type: 'object',
-                required: ['title'],
+                required: ['title', 'todoList'],
                 properties: {
                     title: { type: 'string' },
+                    todoList: { type: 'string' },
                 },
             }, {
                 type: 'array',
